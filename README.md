@@ -10,10 +10,8 @@ The goal is to discover meaningful insights and build visualizations that help t
 
 ## Language and Libraries
 Python version 3.13.7
-numpy
-pandas
-matplotlib 
-Jupyter Notebook
+
+numpy, pandas, matplotlib, Jupyter Notebook
 
 ## How to run
 _Have python version 3.13.7_

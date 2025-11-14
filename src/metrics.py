@@ -58,11 +58,11 @@ def confidence_inteval(df: pd.DataFrame) -> pd.DataFrame:
     upper_bound = mean_sys_bp + z * se
 
     
-    print("\n\nConfidence interval for the mean value of systolic_bp with normal approximation (95% CI)\n")
+    print("\n\nConfidence interval för medelvärdet av systoliskt_bp med normal approximation (95% CI)\n")
     print(f"Mean systolic_bp: {mean_sys_bp:.2f}")
     print(f"Standard deviation: {std_sys_bp:.2f}")
-    print(f"Standard error: {se:.2f}\n\n")
-    print(f"95% CI: ({lower_bound:.2f}, {upper_bound:.2f})\n\n")
+    print(f"Standard error: {se:.2f}")
+    print(f"95% CI: ({lower_bound:.2f}, {upper_bound:.2f})\n")
 
 def confidence_inteval_bootstrap(df: pd.DataFrame, confidence = 0.95) -> pd.DataFrame:
     sys_bp = df['systolic_bp']   
@@ -83,17 +83,17 @@ def confidence_inteval_bootstrap(df: pd.DataFrame, confidence = 0.95) -> pd.Data
     b_means = np.mean(bootstrap_means)
 
     
-    print("\n\nConfidence interval för medelvärdet av systoliskt_bp med bootstrap (95% CI)\n")
-    print(f"True Mean systolic_bp: {true_mean:.2f}\n\n")
-    print(f"Bootstrap Mean systolic_bp: {b_means:.2f}\n\n")
-    print(f"95% CI: ({lower_bound_bootstrap:.2f}, {upper_bound_bootstrap:.2f})\n\n")
+    print("\nConfidence interval för medelvärdet av systoliskt_bp med bootstrap (95% CI)\n")
+    print(f"True Mean systolic_bp: {true_mean:.2f}")
+    print(f"Bootstrap Mean systolic_bp: {b_means:.2f}")
+    print(f"95% CI: ({lower_bound_bootstrap:.2f}, {upper_bound_bootstrap:.2f})\n")
 
 def hypothesis_testing(df: pd.DataFrame,) -> pd.DataFrame:
 
     #Hypotesprövning med bootstrap:
-    print("\n\nTesta hypotesen: ”Rökare har högre medel-blodtryck än icke-rökare.\n")
-    print("Null hypotesen = Rökare har högre medel-blodtryck än icke-rökare.\n")
-    print("\n\nAlternative hypotesen: Rökare har lika eller lägre medel-blodtryck än icke-rökare.\n")
+    print("\nTesta hypotesen: Rökare har högre medel-blodtryck än icke-rökare.\n")
+    print("Null hypotesen = Rökare har högre medel-blodtryck än icke-rökare.")
+    print("Alternative hypotesen: Rökare har lika eller lägre medel-blodtryck än icke-rökare.\n")
 
     smokers = df[df["smoker"] == "Yes"]["systolic_bp"].dropna().values
     nonsmokers = df[df["smoker"] == "No"]["systolic_bp"].dropna().values
@@ -118,6 +118,7 @@ def hypothesis_testing(df: pd.DataFrame,) -> pd.DataFrame:
     print("Medel systoliskt blodtryck för icke-rökare med bootstrap: {:.2f}".format(boot_nonsmokers.mean()))
     print(f"Observerad skillnad: {obs_diff:.4f}")
     print(f"P-value med bootstrap: {p_value_boot:.4f}")
+    print("Slutsats: P-värdet (0,3231) är större än den vanliga signifikansnivån 0,05. Kan inte förkasta null hypotesen.") 
    
     
     

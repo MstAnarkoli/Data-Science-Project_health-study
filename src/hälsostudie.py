@@ -21,10 +21,6 @@ def main():
     
     calculate_disease_proportion(df)
     
-    #sim_prop = calculate_disease_proportion(df.to_dict('records'))
-    #print(f"Calculated disease proportion: {sim_prop:.3f} ({sim_prop*100:.1f}%)")
-
-
     sim_prop_np = simulate_disease_proportion()
     print(f"Simulated disease proportion: {sim_prop_np:.3f} ({sim_prop_np*100:.1f}%)")
 

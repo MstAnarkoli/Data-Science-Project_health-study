@@ -1,4 +1,4 @@
-### Project Title: Data Analysis with Python
+# Project Title: Data Analysis with Python
 
 ## Project Overview
 
@@ -6,25 +6,7 @@ As a data analyst at a research institute have been given access to data from a 
 This project focuses on analyzing  **Health Data** from the research institute using Python and present results in a Jupyter Notebook. 
 The goal is to discover meaningful insights and build visualizations that help to understand the underlying trends and patterns.
 
-## Project Structure
-Data Analysis with Python(Hälsostudie)
-│
-├── data/
-│   └──health_study_dataset.csv     # Original dataset
-│   
-│
-├── notebooks/
-│   └── report.ipynb                # Jupyter notebook with full analysis
-│
-├── scr/
-│   ├── hälsostudie.py.py           # Main function
-│   ├── io_utils.py                 # Data load function
-│   ├── metrics.py                  # Data calculation functions
-│   └── viz.py                      # Data vizualization functions
-│
-├── .gitignore                      # Ignore files from git remote
-├── README.md                       # Project documentation
-└── requirements.txt                # Dependencies
+
 
 ## Language and Libraries
 Python version 3.13.7
@@ -36,9 +18,11 @@ Jupyter Notebook
 ## How to run
 _Have python version 3.13.7_
 
--**Clone the repository**:  git clone https://github.com/MstAnarkoli/Data-Science-Project_health-study.git
--**Install dependencies** : pip install -r requirements.txt
--**Open notebooks/report.ipynb** and run all cells to see the results and charts and interpretations
+**Clone the repository**:  git clone https://github.com/MstAnarkoli/Data-Science-Project_health-study.git
+
+**Install dependencies** : pip install -r requirements.txt
+
+**Open notebooks/report.ipynb** and run all cells to see the results and charts and interpretations
 
 
 

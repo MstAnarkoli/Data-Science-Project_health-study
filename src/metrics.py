@@ -2,8 +2,39 @@ import pandas as pd
 import numpy as np
 import random
 from scipy import stats
+import matplotlib.pyplot as plt
+
+#from sklearn.linear_model import LinearRegression
 
 
+
+def regression_bp_age(df):
+    X = df[['age']].values        # Oberoende variabel (ålder)
+    y = df['systolic_bp'].values  # Beroende variabel (blodtryck)
+
+    model = LinearRegression()
+    model.fit(X, y)
+
+    # Prediktion
+    df['pred_bp'] = model.predict(X)
+
+    # Visa resultat
+    print("Intercept:", round(model.intercept_, 2))
+    print("Slope:", round(model.coef_[0], 2))
+    print("\nModel: BP = age * slope + intercept")
+
+    # Plot
+    plt.figure(figsize=(8,5))
+    plt.scatter(df['age'], df['systolic_bp'], label='Data')
+    plt.plot(df['age'], df['pred_bp'], linewidth=2, label='Regression line')
+    plt.xlabel("Ålder")
+    plt.ylabel("Systoliskt blodtryck")
+    plt.title("Linjär regression: blodtryck baserat på ålder")
+    plt.legend()
+    plt.show()
+
+    return model
+    regression_bp_age(df)
 
 def descriptive_stats(df: pd.DataFrame) -> pd.DataFrame:
     """

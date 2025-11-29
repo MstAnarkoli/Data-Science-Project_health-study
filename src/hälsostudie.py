@@ -2,7 +2,10 @@ from io_utils import load_data
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 #from metrics import regression_bp_age
 #from viz import 
 
@@ -27,26 +30,17 @@ class HealthAnalyzer:
         stats = stats.rename(columns={'mean': 'Mean', 'median': 'Median', 'min': 'Min', 'max': 'Max'})
         
         return stats.round(2)
-
- 
-
-    def average_blood_pressure(self):
-        """Beräknar medelvärdet av systolic_bp."""
-        
-        systolic_bp = self.df['systolic_bp'].dropna()
-        systolyc_bp_mean =  np.mean(systolic_bp)
-        return systolyc_bp_mean
             
 
-    def plot_age_vs_bp(self):
+    def plot_cholesterol_vs_bp(self):
 
-        age = self.df['age'].dropna()
+        cholesterol = self.df['cholesterol'].dropna()
         systolic_bp = self.df['systolic_bp'].dropna()
         """Ritar scatter-plot mellan ålder och blodtryck."""
-        plt.scatter(age, systolic_bp)
-        plt.xlabel("Ålder")
+        plt.scatter(cholesterol, systolic_bp)
+        plt.xlabel("Cholesterol")
         plt.ylabel("Systoliskt blodtryck")
-        plt.title("Ålder vs Systoliskt blodtryck")
+        plt.title("Cholesterol vs Systoliskt blodtryck")
         plt.show()
 
     
@@ -69,9 +63,11 @@ class HealthAnalyzer:
 
         model = LinearRegression()
         model.fit(X, y)
+        
 
         # Prediktion
-        self.df['pred_bp'] = model.predict(X)
+        y_hat = model.predict(X)
+        
 
         # Visa resultat
         print("Intercept:", round(model.intercept_, 2))
@@ -81,12 +77,135 @@ class HealthAnalyzer:
         # Plot
         plt.figure(figsize=(8,5))
         plt.scatter(self.df['age'], self.df['systolic_bp'], label='Data')
-        plt.plot(self.df['age'], self.df['pred_bp'], linewidth=2, label='Regression line')
+        plt.plot(self.df['age'], y_hat, linewidth=1, color='black', label='Regression line')
         plt.xlabel("Ålder")
         plt.ylabel("Systoliskt blodtryck")
         plt.title("Linjär regression: blodtryck baserat på ålder")
         plt.legend()
         plt.show()
+
+
+
+        # Residual model
+        
+        residuals = y - y_hat
+        self.df['residuals'] = residuals
+
+       #Residual plot       
+        plt.figure(figsize=(8,5))
+        plt.scatter(y_hat, residuals, alpha=0.7, label='Residuals')
+        plt.axhline(0, color='black', linewidth=2)   # horizontal reference line
+        plt.xlabel("Förutsagt blodtryck")
+        plt.ylabel("Residual (y - y_hat)")
+        plt.title("Residualer vs. förutsagt värde")
+        plt.legend()
+        plt.show()
+
+
+    def pca_model(self):
+        self.df['sex'] = self.df['sex'].map({'F': 0, 'M': 1})
+        self.df['smoker'] = self.df['smoker'].map({'No': 0, 'Yes': 1})
+
+        # Select numeric columns for PCA
+        features = ['age', 'sex', 'height', 'weight', 'systolic_bp', 'cholesterol', 'smoker']
+        X = self.df[features]
+
+        # Standardize
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        # PCA (2 components for visualization)
+        pca2 = PCA(n_components=2)
+        principal_components = pca2.fit_transform(X_scaled)
+
+        # Create a DataFrame for plotting
+        pca2_df = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2'])
+        pca2_df['disease'] = self.df['disease']  # optional for coloring
+
+        # Scatter plot to visualize clusters/patterns
+        plt.figure(figsize=(8,6))
+        colors = ['blue' if d == 0 else 'red' for d in pca2_df['disease']]
+        plt.scatter(pca2_df['PC1'], pca2_df['PC2'], c=colors)
+        plt.xlabel('PC1')
+        plt.ylabel('PC2')
+        plt.title('PCA - First Two Components')
+        # Add legend manually
+        from matplotlib.lines import Line2D
+        legend_elements = [
+            Line2D([0], [0], marker='o', color='w', label='Disease = 0 (No Disease)',
+                markerfacecolor='blue', markersize=10),
+            Line2D([0], [0], marker='o', color='w', label='Disease = 1 (Has Disease)',
+                markerfacecolor='red', markersize=10),
+        ]
+
+        plt.legend(handles=legend_elements, loc='upper right')
+
+        plt.show()
+
+        # PCA with 3 components
+        pca3 = PCA(n_components=3)
+        pca3_result = pca3.fit_transform(X_scaled)
+
+        # Create a PCA dataframe
+        pca3_df = pd.DataFrame({
+            'PC1': pca3_result[:,0],
+            'PC2': pca3_result[:,1],
+            'PC3': pca3_result[:,2],
+            'disease': self.df['disease']
+        })
+
+        # 3D scatter plot
+        fig = plt.figure(figsize=(10,8))
+        ax = fig.add_subplot(111, projection='3d')
+
+        # Colors for disease
+        colors = ['blue' if d==0 else 'red' for d in pca3_df['disease']]
+
+        ax.scatter(
+            pca3_df['PC1'], 
+            pca3_df['PC2'], 
+            pca3_df['PC3'], 
+            c=colors, 
+            s=50,
+            label=None
+        )
+
+        # Add legend manually
+        from matplotlib.lines import Line2D
+        legend_elements = [
+            Line2D([0], [0], marker='o', color='w', label='Disease = 0 (No Disease)',
+                markerfacecolor='blue', markersize=10),
+            Line2D([0], [0], marker='o', color='w', label='Disease = 1 (Has Disease)',
+                markerfacecolor='red', markersize=10),
+        ]
+
+        ax.legend(handles=legend_elements, loc='upper right')
+
+        ax.set_xlabel("PC1")
+        ax.set_ylabel("PC2")
+        ax.set_zlabel("PC3")
+        ax.set_title("3D PCA Plot Colored by Disease (with Legend)")
+
+        plt.show()
+
+
+    def corr_heatmap(self, columns):
+        C = self.df[columns].corr()
+            
+        plt.figure(figsize=(6,5))
+        plt.imshow(C, cmap='RdBu', vmin=-1, vmax=1)
+        plt.colorbar(fraction=0.05, pad=0.05)
+        plt.title('Korrelationsmatris')
+        plt.xticks(range(len(columns)), columns, rotation=45, ha='right')
+        plt.yticks(range(len(columns)), columns)
+        plt.tight_layout(); plt.show()
+            
+        
+            
+        plt.show()
+    
+
+
 
     
 

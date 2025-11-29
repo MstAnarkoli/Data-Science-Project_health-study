@@ -50,13 +50,13 @@ class HealthAnalyzer:
 
     def plot_avg_weight_by_gender(self):
         avg_weights = self.df.groupby("sex")["weight"].mean()
-        plt.bar(avg_weights.index, avg_weights.values)
+        plt.bar(avg_weights.index, avg_weights.values, color=['pink', 'lightblue'], width = 0.5)
         plt.xlabel("Kön")
         plt.ylabel("Genomsnittlig vikt (kg)")
         plt.title("Genomsnittlig vikt per kön")
         plt.show()
        
-
+ 
     def regression_bp_age(self):
         X = self.df[['age']].values        # Oberoende variabel (ålder)
         y = self.df['systolic_bp'].values  # Beroende variabel (blodtryck)
@@ -93,7 +93,7 @@ class HealthAnalyzer:
 
        #Residual plot       
         plt.figure(figsize=(8,5))
-        plt.scatter(y_hat, residuals, alpha=0.7, label='Residuals')
+        plt.scatter(y_hat, residuals, label='Residuals')
         plt.axhline(0, color='black', linewidth=2)   # horizontal reference line
         plt.xlabel("Förutsagt blodtryck")
         plt.ylabel("Residual (y - y_hat)")
@@ -198,16 +198,52 @@ class HealthAnalyzer:
         plt.title('Korrelationsmatris')
         plt.xticks(range(len(columns)), columns, rotation=45, ha='right')
         plt.yticks(range(len(columns)), columns)
-        plt.tight_layout(); plt.show()
-            
-        
-            
+        plt.tight_layout(); 
         plt.show()
-    
+            
+
+    def  disease_gender(self):
+        df = self.df.copy()
+
+        # Visa sjukdom som numerisk (0/1)
+        df["disease"] = df["disease"].astype(int)
+        df["sex"] = df["sex"].map({0: "F", 1: "M"})
+
+        # Sjukdomsincidens per kön
+        incidence = df.groupby("sex")["disease"].mean()
+        print("Disease incidence (%):")
+        print((incidence * 100).round(2))
+
+        # Antal sjukdomar per kön:
+        counts = df.groupby(["sex", "disease"]).size().unstack(fill_value=0)
+        counts = counts.rename(columns={0: "Frisk", 1: "Sjuk"})
+        print("\nAntal sjukdomar per kön::")
+        print(counts)
+
+        # Visualisera resultatet
+        import matplotlib.pyplot as plt
+
+        counts.plot(kind="bar", stacked=True)
+        plt.title("Andel sjukdomar per kön")
+        plt.xlabel("Kön")
+        plt.ylabel("Antal personer")
+        plt.legend(["Frisk", "Sjuk"])
+        plt.show()
+
+        # Chi-square test (kontrollerar om kön och sjukdom är relaterade)
+        from scipy.stats import chi2_contingency
+
+        chi2, p, dof, expected = chi2_contingency(counts)
+        print("\nChi-square test:")
+        print("Chi2 =", chi2)
+        print("p-value =", p)
+
+
+            
 
 
 
-    
+            
 
 
 

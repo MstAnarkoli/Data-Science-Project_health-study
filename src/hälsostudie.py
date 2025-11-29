@@ -6,8 +6,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-#from metrics import regression_bp_age
-#from viz import 
 
 
 class HealthAnalyzer:
@@ -58,8 +56,8 @@ class HealthAnalyzer:
        
  
     def regression_bp_age(self):
-        X = self.df[['age']].values        # Oberoende variabel (ålder)
-        y = self.df['systolic_bp'].values  # Beroende variabel (blodtryck)
+        X = self.df[['age']].to_numpy()        # Oberoende variabel (ålder)
+        y = self.df['systolic_bp'].to_numpy()  # Beroende variabel (blodtryck)
 
         model = LinearRegression()
         model.fit(X, y)
@@ -106,35 +104,35 @@ class HealthAnalyzer:
         self.df['sex'] = self.df['sex'].map({'F': 0, 'M': 1})
         self.df['smoker'] = self.df['smoker'].map({'No': 0, 'Yes': 1})
 
-        # Select numeric columns for PCA
+        # Välj numeriska kolumner för PCA
         features = ['age', 'sex', 'height', 'weight', 'systolic_bp', 'cholesterol', 'smoker']
         X = self.df[features]
 
-        # Standardize
+        # Standardisera
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
 
-        # PCA (2 components for visualization)
+        # PCA (2 komponenter för visualisering)
         pca2 = PCA(n_components=2)
         principal_components = pca2.fit_transform(X_scaled)
 
         # Create a DataFrame for plotting
         pca2_df = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2'])
-        pca2_df['disease'] = self.df['disease']  # optional for coloring
+        pca2_df['disease'] = self.df['disease']  # för färgläggning
 
-        # Scatter plot to visualize clusters/patterns
+        # Scatter plot att visualisera kluster/mönster
         plt.figure(figsize=(8,6))
         colors = ['blue' if d == 0 else 'red' for d in pca2_df['disease']]
         plt.scatter(pca2_df['PC1'], pca2_df['PC2'], c=colors)
         plt.xlabel('PC1')
         plt.ylabel('PC2')
-        plt.title('PCA - First Two Components')
-        # Add legend manually
+        plt.title('PCA - De två första komponenterna (färgade efter sjukdom)')
+        # Lägg till Legend manuellt
         from matplotlib.lines import Line2D
         legend_elements = [
-            Line2D([0], [0], marker='o', color='w', label='Disease = 0 (No Disease)',
+            Line2D([0], [0], marker='o', color='w', label='Frisk',
                 markerfacecolor='blue', markersize=10),
-            Line2D([0], [0], marker='o', color='w', label='Disease = 1 (Has Disease)',
+            Line2D([0], [0], marker='o', color='w', label='Sjuk',
                 markerfacecolor='red', markersize=10),
         ]
 
@@ -142,11 +140,11 @@ class HealthAnalyzer:
 
         plt.show()
 
-        # PCA with 3 components
+        # PCA:3 komponenter för 3D-plot
         pca3 = PCA(n_components=3)
         pca3_result = pca3.fit_transform(X_scaled)
 
-        # Create a PCA dataframe
+        # Skapa PCA dataframe
         pca3_df = pd.DataFrame({
             'PC1': pca3_result[:,0],
             'PC2': pca3_result[:,1],
@@ -158,7 +156,7 @@ class HealthAnalyzer:
         fig = plt.figure(figsize=(10,8))
         ax = fig.add_subplot(111, projection='3d')
 
-        # Colors for disease
+        # Färger för sjukdomar
         colors = ['blue' if d==0 else 'red' for d in pca3_df['disease']]
 
         ax.scatter(
@@ -170,12 +168,12 @@ class HealthAnalyzer:
             label=None
         )
 
-        # Add legend manually
+        # Lägg till Legend manuellt
         from matplotlib.lines import Line2D
         legend_elements = [
-            Line2D([0], [0], marker='o', color='w', label='Disease = 0 (No Disease)',
+            Line2D([0], [0], marker='o', color='w', label='Frisk',
                 markerfacecolor='blue', markersize=10),
-            Line2D([0], [0], marker='o', color='w', label='Disease = 1 (Has Disease)',
+            Line2D([0], [0], marker='o', color='w', label='Sjuk',
                 markerfacecolor='red', markersize=10),
         ]
 
@@ -184,7 +182,7 @@ class HealthAnalyzer:
         ax.set_xlabel("PC1")
         ax.set_ylabel("PC2")
         ax.set_zlabel("PC3")
-        ax.set_title("3D PCA Plot Colored by Disease (with Legend)")
+        ax.set_title("3D PCA Plot (Färgad av sjukdom))")
 
         plt.show()
 
@@ -211,7 +209,7 @@ class HealthAnalyzer:
 
         # Sjukdomsincidens per kön
         incidence = df.groupby("sex")["disease"].mean()
-        print("Disease incidence (%):")
+        print("Sjukdomsincidens (%):")
         print((incidence * 100).round(2))
 
         # Antal sjukdomar per kön:
